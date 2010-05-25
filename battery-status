@@ -100,8 +100,9 @@ try:
 		def init_widgets(self):
 			"""Create widgets for indicator"""
 			# init battery indicator state
+			self.icon_name = "gpm-ac-adapter"
 			self.indicator.set_status(appindicator.STATUS_ACTIVE)
-			self.indicator.set_icon("gpm-ac-adapter")
+			self.indicator.set_icon(self.icon_name)
 			# get current icon theme for icons
 			self.icon_theme = gtk.icon_theme_get_default()
 			self.icon_theme.append_search_path('/usr/share/gnome-power-manager/icons')
@@ -898,31 +899,30 @@ try:
 			elif self.battery_percent >= self.option_percentage_low:
 				self.on_low_battery = False
 			# generate icon name according to current percentage
-			icon = "gpm-battery-100"
 			if self.battery_percent >= 0 and self.battery_percent < 10:
-				icon = "gpm-battery-000"
+				self.icon_name = "gpm-battery-000"
 			elif self.battery_percent >= 10 and self.battery_percent < 20:
-				icon = "gpm-battery-020"
+				self.icon_name = "gpm-battery-020"
 			elif self.battery_percent >= 20 and self.battery_percent < 48:
-				icon = "gpm-battery-040"
+				self.icon_name = "gpm-battery-040"
 			elif self.battery_percent >= 48 and self.battery_percent < 75:
-				icon = "gpm-battery-060"
+				self.icon_name = "gpm-battery-060"
 			elif self.battery_percent >= 75 and self.battery_percent < 89:
-				icon = "gpm-battery-080"
+				self.icon_name = "gpm-battery-080"
 			elif self.battery_percent >= 89 and self.battery_percent <= 100:
-				icon = "gpm-battery-100"
+				self.icon_name = "gpm-battery-100"
 			if self.battery_state == self.power_battery_state[self.battery_full]:
-				icon = "gpm-battery-charged"
+				self.icon_name = "gpm-battery-charged"
 			elif self.battery_state == "charging":
-				icon += "-charging"
+				self.icon_name += "-charging"
 			# set up battery icon for main icon widget
-			self.indicator.set_icon(icon)
+			self.indicator.set_icon(self.icon_name)
 			if self.option_icon == "always" or (self.option_icon == "low" and self.on_low_battery) or (self.option_icon == "charge" and self.battery_state != self.power_battery_state[self.battery_full]):
 				self.indicator.set_status(appindicator.STATUS_ACTIVE)
 			else:
 				self.indicator.set_status(appindicator.STATUS_PASSIVE)
 			# set up battery icon for battery status dialog
-			self.pixbuf_battery_info = self.icon_theme.load_icon(icon, 128, gtk.ICON_LOOKUP_FORCE_SVG)
+			self.pixbuf_battery_info = self.icon_theme.load_icon(self.icon_name, 128, gtk.ICON_LOOKUP_FORCE_SVG)
 			# init local variable for tooltip
 			battery_time = "-:--"
 			# get battery lifetime
@@ -1321,7 +1321,8 @@ class BatteryApplet(gnomeapplet.Applet):
 		# icon of gnome-power-manager
 		self.pixbuf_gpm_32 = self.icon_theme.load_icon("gnome-power-manager", 32, gtk.ICON_LOOKUP_FORCE_SVG)
 		# icon of battery status
-		pixbuf_battery_24 = self.icon_theme.load_icon("gpm-ac-adapter", 24, gtk.ICON_LOOKUP_FORCE_SVG)
+		self.icon_name = "gpm-ac-adapter"
+		pixbuf_battery_24 = self.icon_theme.load_icon(self.icon_name, 24, gtk.ICON_LOOKUP_FORCE_SVG)
 		self.icon = gtk.Image()
 		self.icon.set_from_pixbuf(pixbuf_battery_24)
 		# label with text of battery status
@@ -2580,41 +2581,40 @@ class BatteryApplet(gnomeapplet.Applet):
 		elif self.battery_percent >= self.option_percentage_low:
 			self.on_low_battery = False
 		# generate icon name according to current percentage
-		icon = "gpm-battery-100"
 		if self.battery_percent >= 0 and self.battery_percent < 10:
-			icon = "gpm-battery-000"
+			self.icon_name = "gpm-battery-000"
 		elif self.battery_percent >= 10 and self.battery_percent < 20:
-			icon = "gpm-battery-020"
+			self.icon_name = "gpm-battery-020"
 		elif self.battery_percent >= 20 and self.battery_percent < 48:
-			icon = "gpm-battery-040"
+			self.icon_name = "gpm-battery-040"
 		elif self.battery_percent >= 48 and self.battery_percent < 75:
-			icon = "gpm-battery-060"
+			self.icon_name = "gpm-battery-060"
 		elif self.battery_percent >= 75 and self.battery_percent < 89:
-			icon = "gpm-battery-080"
+			self.icon_name = "gpm-battery-080"
 		elif self.battery_percent >= 89 and self.battery_percent <= 100:
-			icon = "gpm-battery-100"
+			self.icon_name = "gpm-battery-100"
 		if self.battery_state == self.power_battery_state[self.battery_full]:
-			icon = "gpm-battery-charged"
+			self.icon_name = "gpm-battery-charged"
 		elif self.battery_state == "charging":
-			icon += "-charging"
+			self.icon_name += "-charging"
 		### set up battery icons
 		# set up battery icon for main icon widget
 		if self.option_icon == "always" or (self.option_icon == "low" and self.on_low_battery) or (self.option_icon == "charge" and self.battery_state != self.power_battery_state[self.battery_full]):
-			self.icon.set_from_pixbuf(self.icon_theme.load_icon(icon, 24, gtk.ICON_LOOKUP_FORCE_SVG))
+			self.icon.set_from_pixbuf(self.icon_theme.load_icon(self.icon_name, 24, gtk.ICON_LOOKUP_FORCE_SVG))
 		else:
 			self.icon.set_from_pixbuf(None)
 		# set up global battery icon status for item status in main menu
-		self.icon_status.set_from_pixbuf(self.icon_theme.load_icon(icon, 16, gtk.ICON_LOOKUP_FORCE_SVG))
+		self.icon_status.set_from_pixbuf(self.icon_theme.load_icon(self.icon_name, 16, gtk.ICON_LOOKUP_FORCE_SVG))
 		# set up local battery icon status for item status in main menu
 		icon_status = gtk.Image()
-		icon_status.set_from_pixbuf(self.icon_theme.load_icon(icon, 16, gtk.ICON_LOOKUP_FORCE_SVG))
+		icon_status.set_from_pixbuf(self.icon_theme.load_icon(self.icon_name, 16, gtk.ICON_LOOKUP_FORCE_SVG))
 		self.item_status.set_image(icon_status)
 		# set up local battery icon status for locked item status in main menu
 		icon_status_lock = gtk.Image()
-		icon_status_lock.set_from_pixbuf(self.icon_theme.load_icon(icon, 16, gtk.ICON_LOOKUP_FORCE_SVG))
+		icon_status_lock.set_from_pixbuf(self.icon_theme.load_icon(self.icon_name, 16, gtk.ICON_LOOKUP_FORCE_SVG))
 		self.item_status_lock.set_image(icon_status_lock)
 		# set up battery icon for battery status dialog
-		self.pixbuf_battery_info = self.icon_theme.load_icon(icon, 128, gtk.ICON_LOOKUP_FORCE_SVG)
+		self.pixbuf_battery_info = self.icon_theme.load_icon(self.icon_name, 128, gtk.ICON_LOOKUP_FORCE_SVG)
 		# init local variable for tooltip
 		battery_time = "-:--"
 		# get battery lifetime
