@@ -828,7 +828,15 @@ try:
 			if len(power_ac_devices) == 0:
 				self.power_ac_address = ""
 			elif len(power_ac_devices) == 1:
-				self.power_ac_address = power_ac_devices[0]
+				# get info for available AC
+				power_ac_object = self.bus.get_object(self.power_bus, power_ac_devices[0])
+				power_ac_interface = dbus.Interface(power_ac_object, self.properties_bus)
+				power_ac = power_ac_interface.GetAll("")
+				# check type of available AC
+				if self.power_device_types[power_ac['Type']] == self.power_device_types[1] and power_ac['PowerSupply']:
+					self.power_ac_address = power_ac_devices[0]
+				else:
+					self.power_ac_address = ""
 			else:
 				# multiple AC power lines - is it possible?
 				pass
@@ -841,7 +849,7 @@ try:
 				self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
 				power_battery = self.power_battery_interface.GetAll("")
 				# check type of available battery
-				if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+				if self.power_device_types[power_battery['Type']] == self.power_device_types[2] and power_battery['PowerSupply']:
 					self.power_battery_address = power_battery_devices[0]
 				else:
 					self.power_battery_address = ""
@@ -853,7 +861,7 @@ try:
 					self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
 					power_battery = self.power_battery_interface.GetAll("")
 					# finding laptop battery address
-					if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+					if self.power_device_types[power_battery['Type']] == self.power_device_types[2] and power_battery['PowerSupply']:
 						self.power_battery_address = battery_address
 						break
 			# check availability of battery
@@ -2521,7 +2529,7 @@ class BatteryApplet(gnomeapplet.Applet):
 	
 	
 	def power_dbus_signal(self, device = None, signal = None):
-		""""Get battery power information on update"""
+		"""Get battery power information on update"""
 		# get list of available power devices
 		power_devices = self.power_interface.EnumerateDevices()
 		# list for AC devices
@@ -2538,7 +2546,15 @@ class BatteryApplet(gnomeapplet.Applet):
 		if len(power_ac_devices) == 0:
 			self.power_ac_address = ""
 		elif len(power_ac_devices) == 1:
-			self.power_ac_address = power_ac_devices[0]
+			# get info for available AC
+			power_ac_object = self.bus.get_object(self.power_bus, power_ac_devices[0])
+			power_ac_interface = dbus.Interface(power_ac_object, self.properties_bus)
+			power_ac = power_ac_interface.GetAll("")
+			# check type of available AC
+			if self.power_device_types[power_ac['Type']] == self.power_device_types[1] and power_ac['PowerSupply']:
+				self.power_ac_address = power_ac_devices[0]
+			else:
+				self.power_ac_address = ""
 		else:
 			# multiple AC power lines - is it possible?
 			pass
@@ -2551,7 +2567,7 @@ class BatteryApplet(gnomeapplet.Applet):
 			self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
 			power_battery = self.power_battery_interface.GetAll("")
 			# check type of available battery
-			if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+			if self.power_device_types[power_battery['Type']] == self.power_device_types[2] and power_battery['PowerSupply']:
 				self.power_battery_address = power_battery_devices[0]
 			else:
 				self.power_battery_address = ""
@@ -2563,7 +2579,7 @@ class BatteryApplet(gnomeapplet.Applet):
 				self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
 				power_battery = self.power_battery_interface.GetAll("")
 				# finding laptop battery address
-				if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+				if self.power_device_types[power_battery['Type']] == self.power_device_types[2] and power_battery['PowerSupply']:
 					self.power_battery_address = battery_address
 					break
 		# check availability of battery
