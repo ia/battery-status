@@ -178,7 +178,10 @@ try:
 				except:
 					pass
 			else:
-				pass
+				self.package_screensaver = True
+				self.package_session = True
+				self.package_power = True
+				self.package_cpufreq = True
 		
 		
 		def init_first_run(self):
@@ -2015,7 +2018,10 @@ class BatteryApplet(gnomeapplet.Applet):
 			except:
 				pass
 		else:
-			pass
+			self.package_screensaver = True
+			self.package_session = True
+			self.package_power = True
+			self.package_cpufreq = True
 	
 	
 	def init_pp_menu(self):
