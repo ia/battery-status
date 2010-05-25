@@ -696,19 +696,19 @@ try:
 		
 		
 		def init_power_dbus(self):
-			'''Init D-Bus UPower/DeviceKit-Power environment'''
+			"""Init D-Bus UPower/DeviceKit-Power environment"""
 			# set up default values for global D-Bus UPower/DeviceKit-Power related variables
-			power_ac_address = None
-			power_battery_address = None
-			self.power_ac_name = "line_power_AC"
-			self.power_battery_name = "battery_BAT0"
+			self.power_ac_address = None
+			self.power_battery_address = None
+			self.power_ac_name = "line_power"
+			self.power_battery_name = "battery"
 			self.properties_bus = "org.freedesktop.DBus.Properties"
-			# set up battery info dictionaries
-			self.power_battery_types = {0: "Unknown", 1: "Line Power", 2: "Battery", 3: "UPS", 4: "Monitor", 5: "Mouse", 6: "Keyboard", 7: "PDA", 8: "Phone"}
+			# set up power info dictionaries
+			self.power_device_types = {0: "Unknown", 1: "Line Power", 2: "Battery", 3: "UPS", 4: "Monitor", 5: "Mouse", 6: "Keyboard", 7: "PDA", 8: "Phone"}
 			self.power_battery_techs = {0: "Unknown", 1: "Lithium Ion", 2: "Lithium Polymer", 3: "Lithium Iron Phosphate", 4: "Lead Acid", 5: "Nickel Cadmium", 6: "Nickel Metal Hydride"}
 			self.power_battery_state = {0: "unknown", 1: "charging", 2: "discharging", 3: "discharged", 4: "charged"}
 			self.power_battery_tooltip = {0: "", 1: "until charged", 2: "remaining", 3: "", 4: "is fully charged"}
-			self.power_source = {0: "Power Source: AC Line", 1: "Power Source: Battery"}
+			self.power_source = {0: "Po_wer Source: AC Line", 1: "Po_wer Source: Battery"}
 			self.battery_full = 4
 			try:
 				# to create connection for system bus
@@ -802,16 +802,49 @@ try:
 			'''Get battery power information on update'''
 			# get list of available power devices
 			power_devices = self.power_interface.EnumerateDevices()
-			# detect AC and battery
+			# list for AC devices
+			power_ac_devices = []
+			# list for battery devices
+			power_battery_devices = []
+			# detect ACs and batteries
 			for power_device in power_devices:
 				if power_device.find(self.power_battery_name) != -1:
-					self.power_battery_address = power_device
-				elif power_device.find(self.power_battery_name) == -1:
+					power_battery_devices.append(power_device)
+				if power_device.find(self.power_ac_name) != -1:
+					power_ac_devices.append(power_device)
+			# detect primary AC address from available AC devices
+			if len(power_ac_devices) == 0:
+				self.power_ac_address = ""
+			elif len(power_ac_devices) == 1:
+				self.power_ac_address = power_ac_devices[0]
+			else:
+				# multiple AC power lines - is it possible?
+				pass
+			# detect battery address from available battery devices
+			if len(power_battery_devices) == 0:
+				self.power_battery_address = ""
+			elif len(power_battery_devices) == 1:
+				# get info for available battery
+				power_battery_object = self.bus.get_object(self.power_bus, power_battery_devices[0])
+				self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
+				power_battery = self.power_battery_interface.GetAll("")
+				# check type of available battery
+				if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+					self.power_battery_address = power_battery_devices[0]
+				else:
 					self.power_battery_address = ""
-				elif power_device.find(self.power_ac_name) != -1:
-					self.power_ac_address = power_device
-				elif power_device.find(self.power_ac_name) == -1:
-					self.power_ac_address = ""
+			else:
+				# FIXME: code for processing multiple batteries goes here
+				# it hasn't been tested on real multiple batteries, so any bug reports and logs are welcome
+				for battery_address in battery_devices:
+					power_battery_object = self.bus.get_object(self.power_bus, battery_address)
+					self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
+					power_battery = self.power_battery_interface.GetAll("")
+					# finding laptop battery address
+					if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+						self.power_battery_address = battery_address
+						break
+			# check availability of battery
 			if self.power_battery_address:
 				# get battery information, if available
 				power_battery_object = self.bus.get_object(self.power_bus, self.power_battery_address)
@@ -2325,13 +2358,13 @@ class BatteryApplet(gnomeapplet.Applet):
 	def init_power_dbus(self):
 		"""Init D-Bus UPower/DeviceKit-Power environment"""
 		# set up default values for global D-Bus UPower/DeviceKit-Power related variables
-		power_ac_address = None
-		power_battery_address = None
-		self.power_ac_name = "line_power_AC"
-		self.power_battery_name = "battery_BAT0"
+		self.power_ac_address = None
+		self.power_battery_address = None
+		self.power_ac_name = "line_power"
+		self.power_battery_name = "battery"
 		self.properties_bus = "org.freedesktop.DBus.Properties"
-		# set up battery info dictionaries
-		self.power_battery_types = {0: "Unknown", 1: "Line Power", 2: "Battery", 3: "UPS", 4: "Monitor", 5: "Mouse", 6: "Keyboard", 7: "PDA", 8: "Phone"}
+		# set up power info dictionaries
+		self.power_device_types = {0: "Unknown", 1: "Line Power", 2: "Battery", 3: "UPS", 4: "Monitor", 5: "Mouse", 6: "Keyboard", 7: "PDA", 8: "Phone"}
 		self.power_battery_techs = {0: "Unknown", 1: "Lithium Ion", 2: "Lithium Polymer", 3: "Lithium Iron Phosphate", 4: "Lead Acid", 5: "Nickel Cadmium", 6: "Nickel Metal Hydride"}
 		self.power_battery_state = {0: "unknown", 1: "charging", 2: "discharging", 3: "discharged", 4: "charged"}
 		self.power_battery_tooltip = {0: "", 1: "until charged", 2: "remaining", 3: "", 4: "is fully charged"}
@@ -2464,16 +2497,49 @@ class BatteryApplet(gnomeapplet.Applet):
 		""""Get battery power information on update"""
 		# get list of available power devices
 		power_devices = self.power_interface.EnumerateDevices()
-		# detect AC and battery
+		# list for AC devices
+		power_ac_devices = []
+		# list for battery devices
+		power_battery_devices = []
+		# detect ACs and batteries
 		for power_device in power_devices:
 			if power_device.find(self.power_battery_name) != -1:
-				self.power_battery_address = power_device
-			elif power_device.find(self.power_battery_name) == -1:
+				power_battery_devices.append(power_device)
+			if power_device.find(self.power_ac_name) != -1:
+				power_ac_devices.append(power_device)
+		# detect primary AC address from available AC devices
+		if len(power_ac_devices) == 0:
+			self.power_ac_address = ""
+		elif len(power_ac_devices) == 1:
+			self.power_ac_address = power_ac_devices[0]
+		else:
+			# multiple AC power lines - is it possible?
+			pass
+		# detect battery address from available battery devices
+		if len(power_battery_devices) == 0:
+			self.power_battery_address = ""
+		elif len(power_battery_devices) == 1:
+			# get info for available battery
+			power_battery_object = self.bus.get_object(self.power_bus, power_battery_devices[0])
+			self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
+			power_battery = self.power_battery_interface.GetAll("")
+			# check type of available battery
+			if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+				self.power_battery_address = power_battery_devices[0]
+			else:
 				self.power_battery_address = ""
-			elif power_device.find(self.power_ac_name) != -1:
-				self.power_ac_address = power_device
-			elif power_device.find(self.power_ac_name) == -1:
-				self.power_ac_address = ""
+		else:
+			# FIXME: code for processing multiple batteries goes here
+			# it hasn't been tested on real multiple batteries, so any bug reports and logs are welcome
+			for battery_address in battery_devices:
+				power_battery_object = self.bus.get_object(self.power_bus, battery_address)
+				self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
+				power_battery = self.power_battery_interface.GetAll("")
+				# finding laptop battery address
+				if self.power_device_types[power_battery['Type']] == "Battery" and power_battery['PowerSupply']:
+					self.power_battery_address = battery_address
+					break
+		# check availability of battery
 		if self.power_battery_address:
 			# get battery information, if available
 			power_battery_object = self.bus.get_object(self.power_bus, self.power_battery_address)
