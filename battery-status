@@ -51,16 +51,16 @@ try:
 		"""GNOME Battery Status indicator - shows battery status in GNOME indicator area"""
 		
 		
-		# bool var. for default (not available) status of apport package
+		# bool var. for default status of apport package
 		package_apport = False
-		# bool var. for default (not available) status of gnome-screensaver package
-		package_screensaver = False
-		# bool var. for default (not available) status of gnome-session-bin package
-		package_session = False
-		# bool var. for default (not available) status of gnome-power-manager package
-		package_power = False
-		# bool var. for default (not available) status of gnome-applets (with cpufreq-selector as backend for switching CPU frequency) package
-		package_cpufreq = False
+		# bool var. for default status of gnome-screensaver package
+		package_screensaver = True
+		# bool var. for default status of gnome-session-bin package
+		package_session = True
+		# bool var. for default status of gnome-power-manager package
+		package_power = True
+		# bool var. for default status of gnome-applets (with cpufreq-selector as backend for switching CPU frequency) package
+		package_cpufreq = True
 		# bool var. for detect D-Bus UPower/DeviceKit-Power error
 		power_error = False
 		# bool var. for detect CPU frequency scaling error
@@ -142,7 +142,14 @@ try:
 		
 		def init_packages(self):
 			"""Detect packages"""
-			dist = platform.linux_distribution()[0]
+			dist = ""
+			# detect current distribution
+			try:
+				# to get distroname in a python 2.6 way
+				dist = platform.linux_distribution()[0]
+			except:
+				# get distroname in a deprecated way
+				dist = platform.dist()[0]
 			if dist == "Ubuntu" or dist == "debian":
 				try:
 					import apt
@@ -165,27 +172,28 @@ try:
 					transaction = rpm.TransactionSet()
 					matches = transaction.dbMatch()
 					matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-screensaver")
+					self.package_screensaver = False
 					for match in matches:
 						self.package_screensaver = True
 					matches = transaction.dbMatch()
 					matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-session")
+					self.package_session = False
 					for match in matches:
 						self.package_session = True
 					matches = transaction.dbMatch()
 					matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-power-manager-extra")
+					self.package_power = False
 					for match in matches:
 						self.package_power = True
 					matches = transaction.dbMatch()
 					matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-applets")
+					self.package_cpufreq = False
 					for match in matches:
 						self.package_cpufreq = True
 				except:
 					pass
 			else:
-				self.package_screensaver = True
-				self.package_session = True
-				self.package_power = True
-				self.package_cpufreq = True
+				pass
 		
 		
 		def init_first_run(self):
@@ -1272,16 +1280,16 @@ class BatteryApplet(gnomeapplet.Applet):
 	"""GNOME Battery Status applet - shows battery status and battery life/charge time in GNOME panel"""
 	
 	
-	# bool var. for default (not available) status of apport package
+	# bool var. for default status of apport package
 	package_apport = False
-	# bool var. for default (not available) status of gnome-screensaver package
-	package_screensaver = False
-	# bool var. for default (not available) status of gnome-session-bin package
-	package_session = False
-	# bool var. for default (not available) status of gnome-power-manager package
-	package_power = False
-	# bool var. for default (not available) status of gnome-applets (with cpufreq-selector as backend for switching CPU frequency) package
-	package_cpufreq = False
+	# bool var. for default status of gnome-screensaver package
+	package_screensaver = True
+	# bool var. for default status of gnome-session-bin package
+	package_session = True
+	# bool var. for default status of gnome-power-manager package
+	package_power = True
+	# bool var. for default status of gnome-applets (with cpufreq-selector as backend for switching CPU frequency) package
+	package_cpufreq = True
 	# bool var. for detect D-Bus UPower/DeviceKit-Power error
 	power_error = False
 	# bool var. for detect CPU frequency scaling error
@@ -1988,7 +1996,14 @@ class BatteryApplet(gnomeapplet.Applet):
 	
 	def init_packages(self):
 		"""Detect packages"""
-		dist = platform.linux_distribution()[0]
+		dist = ""
+		# detect current distribution
+		try:
+			# to get distroname in a python 2.6 way
+			dist = platform.linux_distribution()[0]
+		except:
+			# get distroname in a deprecated way
+			dist = platform.dist()[0]
 		if dist == "Ubuntu" or dist == "debian":
 			try:
 				import apt
@@ -2011,27 +2026,28 @@ class BatteryApplet(gnomeapplet.Applet):
 				transaction = rpm.TransactionSet()
 				matches = transaction.dbMatch()
 				matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-screensaver")
+				self.package_screensaver = False
 				for match in matches:
 					self.package_screensaver = True
 				matches = transaction.dbMatch()
 				matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-session")
+				self.package_session = False
 				for match in matches:
 					self.package_session = True
 				matches = transaction.dbMatch()
 				matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-power-manager-extra")
+				self.package_power = False
 				for match in matches:
 					self.package_power = True
 				matches = transaction.dbMatch()
 				matches.pattern('name', rpm.RPMMIRE_GLOB, "gnome-applets")
+				self.package_cpufreq = False
 				for match in matches:
 					self.package_cpufreq = True
 			except:
 				pass
 		else:
-			self.package_screensaver = True
-			self.package_session = True
-			self.package_power = True
-			self.package_cpufreq = True
+			pass
 	
 	
 	def init_pp_menu(self):
