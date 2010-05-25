@@ -856,7 +856,7 @@ try:
 			else:
 				# FIXME: code for processing multiple batteries goes here
 				# it hasn't been tested on real multiple batteries, so any bug reports and logs are welcome
-				for battery_address in battery_devices:
+				for battery_address in power_battery_devices:
 					power_battery_object = self.bus.get_object(self.power_bus, battery_address)
 					self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
 					power_battery = self.power_battery_interface.GetAll("")
@@ -2574,7 +2574,7 @@ class BatteryApplet(gnomeapplet.Applet):
 		else:
 			# FIXME: code for processing multiple batteries goes here
 			# it hasn't been tested on real multiple batteries, so any bug reports and logs are welcome
-			for battery_address in battery_devices:
+			for battery_address in power_battery_devices:
 				power_battery_object = self.bus.get_object(self.power_bus, battery_address)
 				self.power_battery_interface = dbus.Interface(power_battery_object, self.properties_bus)
 				power_battery = self.power_battery_interface.GetAll("")
