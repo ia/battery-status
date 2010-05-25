@@ -683,7 +683,7 @@ try:
 			"""Main menu items/actions handler"""
 			action = item.get_label()
 			### Power Source item
-			if action.find("Power Source:") != -1:
+			if action.find("Po_wer Source:") != -1:
 				if self.option_sensitive:
 					# if power_source_sensitive, then set statistics for current power source device
 					if action.find("Battery") != -1:
