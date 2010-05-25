@@ -26,7 +26,7 @@ comment = "Battery Status applet for the GNOME desktop"
 homepage = "http://live.gnome.org/BatteryStatus"
 copyright = "Copyright © 2010 Ivan Zorin"
 authors = ["Ivan Zorin <ivan.a.zorin@gmail.com>",]
-version = "0.1"
+version = "0.1.1"
 
 
 import os
