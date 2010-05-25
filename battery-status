@@ -45,8 +45,8 @@ from dbus.mainloop.glib import DBusGMainLoop
 try:
 	import appindicator
 	module_indicator = True
-
-
+	
+	
 	class BatteryIndicator(appindicator.Indicator):
 		"""GNOME Battery Status indicator - shows battery status in GNOME indicator area"""
 		
@@ -742,7 +742,7 @@ try:
 		
 		
 		def dbus_error(self, exception_text):
-			'''Critical message with technical details, when something goes wrong'''
+			"""Critical message with technical details, when something goes wrong"""
 			# text buffer with details
 			text_buffer = gtk.TextBuffer()
 			text_buffer.set_text("DBus exception:\n" + exception_text)
@@ -780,7 +780,7 @@ try:
 		
 		
 		def power_dbus_signal_error(self, error_type):
-			'''Handle power errors'''
+			"""Handle power errors"""
 			### Keep applet working, even if some power information not available
 			if type(self.lock_battery_status).__name__ == "Dialog":
 				# destroy battery status dialog, if active
@@ -799,7 +799,7 @@ try:
 		
 		
 		def power_dbus_signal(self, device = None):
-			'''Get battery power information on update'''
+			"""Get battery power information on update"""
 			# get list of available power devices
 			power_devices = self.power_interface.EnumerateDevices()
 			# list for AC devices
@@ -997,7 +997,7 @@ try:
 		
 		
 		def critical_low(self):
-			'''Message dialog about low battery percentage'''
+			"""Message dialog about low battery percentage"""
 			# local function for timer management
 			def count(widget, timeout):
 				# update power information
@@ -1073,7 +1073,7 @@ try:
 		
 		
 		def hibernate(self, data = None):
-			'''Hibernate call for UPower/DeviceKit-Power D-Bus'''
+			"""Hibernate call for UPower/DeviceKit-Power D-Bus"""
 			try:
 				if self.package_screensaver and self.option_lock:
 					# to lock screen and
@@ -1086,7 +1086,7 @@ try:
 		
 		
 		def suspend(self, data = None):
-			'''Suspend call for UPower/DeviceKit-Power D-Bus'''
+			"""Suspend call for UPower/DeviceKit-Power D-Bus"""
 			try:
 				if self.package_screensaver and self.option_lock:
 					# to lock screen and
