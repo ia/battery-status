@@ -21,7 +21,7 @@ class InstallData(install_data):
 
 setup(
 	name = "battery-status",
-	version = "0.1",
+	version = "0.1.1",
 	maintainer = "Ivan Zorin",
 	maintainer_email = "ivan.a.zorin@gmail.com",
 	description = "battery status",
