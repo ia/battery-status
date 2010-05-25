@@ -119,6 +119,9 @@ try:
 			# label for battery technical information
 			self.label_info_data = gtk.Label()
 			self.label_info_data.set_justify(gtk.JUSTIFY_CENTER)
+			# label for battery information text
+			self.label_info = gtk.Label()
+			self.label_info.set_justify(gtk.JUSTIFY_LEFT)
 			# progress bar of battery capacity
 			self.progress_capacity = gtk.ProgressBar()
 			self.progress_capacity.set_size_request(200, 24)
@@ -217,8 +220,8 @@ try:
 					powermode_file.close()
 					# get list of CPUs
 					cpu_data = os.popen("ls /sys/devices/system/cpu | grep '^cpu[0-9]*$' | sed 's,^cpu,,'")
-					self.cpu_items = cpu_data.readlines();
-					cpu_data.close();
+					self.cpu_items = cpu_data.readlines()
+					cpu_data.close()
 					self.cpufreq_error = False
 				except:
 					self.cpufreq_error = True
@@ -614,16 +617,13 @@ try:
 			frame_charge.set_border_width(8)
 			frame_charge.add(align_charge)
 			frame_charge.show()
-			# label for battery info text
-			label_info = gtk.Label()
-			label_info.set_markup(text_info)
-			label_info.set_justify(gtk.JUSTIFY_LEFT)
-			label_info.show()
+			# show label with battery info text
+			self.label_info.show()
 			# show label with battery info data
 			self.label_info_data.show()
 			# hbox for battery info labels
 			hbox_info = gtk.HBox()
-			hbox_info.add(label_info)
+			hbox_info.add(self.label_info)
 			hbox_info.add(self.label_info_data)
 			hbox_info.show()
 			# alignment for hbox with battery info
@@ -989,11 +989,17 @@ try:
 				self.progress_charge.set_fraction(progress_charge_data/100)
 				self.progress_charge.set_text(str(int(round(progress_charge_data, 1))) + '%')
 				if self.option_info:
+					# text column for battery info
+					text_info = "Technology:\nVendor:\nModel:"
 					# generate text about battery information
 					text_info_data = '\t' + self.power_battery_techs[power_battery['Technology']] + '\n'
 					text_info_data += '\t' + power_battery['Vendor'] + '\n'
-					text_info_data += '\t' + power_battery['Model'] + '\n'
-					text_info_data += '\t' + power_battery['Serial']
+					text_info_data += '\t' + power_battery['Model']
+					# display serial number only if available
+					if power_battery['Serial'] != "":
+						text_info += "\nSerial:"
+						text_info_data += '\n' + '\t' + power_battery['Serial']
+					self.label_info.set_markup(text_info)
 					self.label_info_data.set_markup(text_info_data)
 			# update power management state and its current settings
 			self.power_management()
@@ -1373,6 +1379,9 @@ class BatteryApplet(gnomeapplet.Applet):
 		# label for battery technical information
 		self.label_info_data = gtk.Label()
 		self.label_info_data.set_justify(gtk.JUSTIFY_CENTER)
+		# label for battery information text
+		self.label_info = gtk.Label()
+		self.label_info.set_justify(gtk.JUSTIFY_LEFT)
 		# progress bar of battery capacity
 		self.progress_capacity = gtk.ProgressBar()
 		self.progress_capacity.set_size_request(200, 24)
@@ -2100,8 +2109,6 @@ class BatteryApplet(gnomeapplet.Applet):
 		text_capacity = "State:\nPercentage:\nCapacity:\nLifetime:\nCharge time:\n"
 		# text column for charge data
 		text_charge = "Voltage:\nRate:\nCurrent:\nLast full:\nMaximum:\n"
-		# text column for battery info
-		text_info = "Technology:\nVendor:\nModel:\nSerial:"
 		# label for capacity text
 		label_capacity = gtk.Label()
 		label_capacity.set_markup(text_capacity)
@@ -2166,16 +2173,13 @@ class BatteryApplet(gnomeapplet.Applet):
 		frame_charge.set_border_width(8)
 		frame_charge.add(align_charge)
 		frame_charge.show()
-		# label for battery info text
-		label_info = gtk.Label()
-		label_info.set_markup(text_info)
-		label_info.set_justify(gtk.JUSTIFY_LEFT)
-		label_info.show()
+		# show label with battery info text
+		self.label_info.show()
 		# show label with battery info data
 		self.label_info_data.show()
 		# hbox for battery info labels
 		hbox_info = gtk.HBox()
-		hbox_info.add(label_info)
+		hbox_info.add(self.label_info)
 		hbox_info.add(self.label_info_data)
 		hbox_info.show()
 		# alignment for hbox with battery info
@@ -2216,8 +2220,8 @@ class BatteryApplet(gnomeapplet.Applet):
 		message_battery_status.vbox.add(frame_info)
 		# copy dialog for destroy it, if user remove applet when dialog open
 		self.lock_battery_status = message_battery_status
-		message_battery_status.run();
-		message_battery_status.destroy();
+		message_battery_status.run()
+		message_battery_status.destroy()
 		# unlock menu
 		self.lock_battery_status = False
 		# make battery item active, only if battery available
@@ -2353,8 +2357,8 @@ class BatteryApplet(gnomeapplet.Applet):
 				powermode_file.close()
 				# get list of CPUs
 				cpu_data = os.popen("ls /sys/devices/system/cpu | grep '^cpu[0-9]*$' | sed 's,^cpu,,'")
-				self.cpu_items = cpu_data.readlines();
-				cpu_data.close();
+				self.cpu_items = cpu_data.readlines()
+				cpu_data.close()
 				self.cpufreq_error = False
 			except:
 				self.cpufreq_error = True
@@ -2749,11 +2753,17 @@ class BatteryApplet(gnomeapplet.Applet):
 			self.progress_charge.set_fraction(progress_charge_data/100)
 			self.progress_charge.set_text(str(int(round(progress_charge_data, 1))) + '%')
 			if self.option_info:
+				# text column for battery info
+				text_info = "Technology:\nVendor:\nModel:"
 				# generate text about battery information
 				text_info_data = '\t' + self.power_battery_techs[power_battery['Technology']] + '\n'
 				text_info_data += '\t' + power_battery['Vendor'] + '\n'
-				text_info_data += '\t' + power_battery['Model'] + '\n'
-				text_info_data += '\t' + power_battery['Serial']
+				text_info_data += '\t' + power_battery['Model']
+				# display serial number only if available
+				if power_battery['Serial'] != "":
+					text_info += "\nSerial:"
+					text_info_data += '\n' + '\t' + power_battery['Serial']
+				self.label_info.set_markup(text_info)
 				self.label_info_data.set_markup(text_info_data)
 		# update power management state and its current settings
 		self.power_management(None, "signal", self.powermode, None)
